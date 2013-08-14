@@ -6,6 +6,8 @@ import java.util.Deque;
 import java.util.List;
 import java.util.Random;
 
+import com.badlogic.gdx.math.Vector2;
+
 public class BspDungeonGeneration {
 	
 	private int width;
@@ -16,6 +18,8 @@ public class BspDungeonGeneration {
 	private int minWidth;
 	private int maxHeight;
 	private int maxWidth;
+	private int minRoomWidth;
+	private int minRoomHeight;
 	private long randomSeed;
 	private Random random;
 	private List<DungeonPartition> leafPartitions;
@@ -40,16 +44,71 @@ public class BspDungeonGeneration {
 			this.partitionDungeon(partitionQueue.pop());
 		}
 		
+		fillPartitions(startingPartition);
+		
 		return startingPartition;
 	}
 	
+	public void fillPartitions(DungeonPartition partition) {
+		if (partition.getLeftChild() != null) {
+			fillPartitions(partition.getLeftChild());
+			fillPartitions(partition.getRightChild());
+			
+			//joinRooms(partition.getLeftChild(), partition.getRightChild(), partition.isHorizontalSplit(), partition);
+		}
+		else {
+			//No children, fill this partition with a room
+			addRoom(partition);
+		}
+	}
+	
+	private void joinRooms(DungeonPartition leftChild,
+			DungeonPartition rightChild, boolean horizontalSplit, DungeonPartition parent) 
+	{
+		if ()
+	}
+
+	private void addRoom(DungeonPartition partition) {
+
+		int roomWidth = this.randomInRange(minRoomWidth, partition.getWidth(), random);
+		int roomHeight = this.randomInRange(minRoomHeight, partition.getHeight(), random);
+		
+		//find a placement for the room that doesn't violate the partitions bounds
+		boolean xPlacementFound = false;
+		Integer roomStartX = null;
+		while (!xPlacementFound) {
+			int startX = randomInRange(partition.startX, partition.endX, random);
+			if (startX + roomWidth <= partition.endX + 1) {
+				roomStartX = new Integer(startX);
+				xPlacementFound = true;
+			}
+		}
+		
+		partition.setRoomWidth(roomWidth);
+		partition.setRoomStartX(roomStartX);
+		
+		boolean yPlacementFound = false;
+		Integer roomStartY = null;
+		while (!yPlacementFound) {
+			int startY = randomInRange(partition.startY, partition.endY, random);
+			if (startY + roomHeight <= partition.endY + 1) {
+				roomStartY = new Integer(startY);
+				yPlacementFound = true;
+			}
+		}
+		
+		partition.setRoomHeight(roomHeight);
+		partition.setRoomStartY(roomStartY);
+		
+		partition.setHasRoom(true);
+	}
+
 	private int randomInRange(int min, int max, Random random) {
 		int randomNum = random.nextInt(max - min + 1) + min;
 		return randomNum;
 	}
 
 	private boolean partitionDungeon(DungeonPartition partition) {
-		System.out.println("Starting partition: " + partition.toString());
 		boolean shouldPartition = true;
 		int partitionSize = partition.getSize();
 		
@@ -82,15 +141,15 @@ public class BspDungeonGeneration {
 		}
 		
 		if (shouldPartition) {
-			
 			partition.setHorizontalSplit(splitHorizontal);
+			
+			DungeonPartition p1, p2;
 			
 			int p1StartX, p1EndX, p1StartY, p1EndY,
 				p2StartX, p2EndX, p2StartY, p2EndY;
 				
 			//Determine the start coords of the bottom partition
 			if (splitHorizontal) {
-				System.out.println("Splitting horizontal");
 				p1StartX = partition.startX;
 				p1StartY = partition.startY;
 				p1EndX = partition.endX;
@@ -114,7 +173,6 @@ public class BspDungeonGeneration {
 				p2EndY = partition.endY;
 			}
 			else {
-				System.out.println("Splitting vertical");
 				p1StartX = partition.startX;
 				p1StartY = partition.startY;
 				p1EndY = partition.endY;
@@ -136,16 +194,10 @@ public class BspDungeonGeneration {
 				p2EndY = partition.endY;
 			}
 
-			DungeonPartition p1 = new DungeonPartition(p1StartX, p1StartY, p1EndX, p1EndY);
+			p1 = new DungeonPartition(p1StartX, p1StartY, p1EndX, p1EndY);
 			p1.setId(count++);
-			DungeonPartition p2 = new DungeonPartition(p2StartX, p2StartY, p2EndX, p2EndY);
+			p2 = new DungeonPartition(p2StartX, p2StartY, p2EndX, p2EndY);
 			p2.setId(count++);
-			
-			System.out.println("Partition 1 is " + p1);
-			System.out.println("Partition 2 is " + p2);
-			
-//			this.partitionDungeon(p1);
-//			this.partitionDungeon(p2);
 			
 			partitionQueue.push(p1);
 			partitionQueue.push(p2);
@@ -156,9 +208,6 @@ public class BspDungeonGeneration {
 			return true;
 		}
 		else {
-			//done with this partition
-			System.out.println("Partition finished");
-			leafPartitions.add(partition);
 			return false;
 		}
 	}
@@ -257,5 +306,21 @@ public class BspDungeonGeneration {
 
 	public void setPartitionQueue(Deque<DungeonPartition> partitionQueue) {
 		this.partitionQueue = partitionQueue;
+	}
+
+	public int getMinRoomWidth() {
+		return minRoomWidth;
+	}
+
+	public void setMinRoomWidth(int minRoomWidth) {
+		this.minRoomWidth = minRoomWidth;
+	}
+
+	public int getMinRoomHeight() {
+		return minRoomHeight;
+	}
+
+	public void setMinRoomHeight(int minRoomHeight) {
+		this.minRoomHeight = minRoomHeight;
 	}
 }

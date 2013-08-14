@@ -1,5 +1,6 @@
 package se.obtu.rogueahoy.test.dungeons;
 
+import java.util.Iterator;
 import java.util.List;
 
 import se.obtu.rogueahoy.dungeons.BspDungeonGeneration;
@@ -11,10 +12,12 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.badlogic.gdx.math.Vector2;
 
 public class PartitionVisualizer extends Game implements InputProcessor {
 	
@@ -49,6 +52,8 @@ public class PartitionVisualizer extends Game implements InputProcessor {
 		generator.setMinWidth(4);
 		generator.setMaxHeight(10);
 		generator.setMaxWidth(10);
+		generator.setMinRoomHeight(4);
+		generator.setMinRoomWidth(4);
 		generator.setMinPartitionSize(25);
 		generator.setMaxPartitionSize(15*15);
 		rootPartition = generator.generate(1376447623589l);
@@ -71,12 +76,8 @@ public class PartitionVisualizer extends Game implements InputProcessor {
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 		
-		shapeRenderer.begin(ShapeType.Line);
 		shapeRenderer.setProjectionMatrix(camera.combined);
-		
 		renderDungeonPartition(rootPartition);
-		
-		shapeRenderer.end();
 	}
 
 	private void renderDungeonPartition(DungeonPartition partition) {
@@ -85,7 +86,29 @@ public class PartitionVisualizer extends Game implements InputProcessor {
 			renderDungeonPartition(partition.getRightChild());
 		}
 		else {
+			shapeRenderer.begin(ShapeType.Filled);
+			shapeRenderer.setColor(Color.RED);
+			shapeRenderer.rect(partition.getRoomStartX(), partition.getRoomStartY(), partition.getRoomWidth(), partition.getRoomHeight());
+			shapeRenderer.end();
+			
+			shapeRenderer.begin(ShapeType.Line);
+			shapeRenderer.setColor(Color.WHITE);
 			shapeRenderer.rect(partition.startX, partition.startY, partition.getWidth(), partition.getHeight());
+			
+			if (partition.getCooridorVertices() != null) {
+				shapeRenderer.setColor(Color.GREEN);
+				Iterator<Vector2> iterator = partition.getCooridorVertices().iterator();
+				Vector2 previousVertex = iterator.next();
+				while (iterator.hasNext()) {
+					shapeRenderer.circle(previousVertex.x, previousVertex.y, 10);
+					Vector2 nextVertex = iterator.next();
+					shapeRenderer.line(previousVertex, nextVertex);
+					
+					previousVertex = nextVertex;
+				}
+			}
+			
+			shapeRenderer.end();
 		}
 	}
 
