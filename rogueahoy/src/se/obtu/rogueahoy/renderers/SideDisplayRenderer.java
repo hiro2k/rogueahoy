@@ -18,8 +18,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.ScissorStack;
 
 public class SideDisplayRenderer {
 	private Rectangle sideDisplayBounds;
-	private static final int MARGIN_SIZE = 16;
-	private static final int TEXT_MARGIN = 16;
+	private static final int MARGIN_SIZE = 8;
+	private static final int TEXT_MARGIN = 4;
 	private static final int GAME_LOG_HEIGHT = 300;
 	private GameState gameState;
 	private ShapeRenderer shapeRenderer;
@@ -49,11 +49,11 @@ public class SideDisplayRenderer {
 		batch.setColor(Color.WHITE);
 		
 		int logMessageCount = 0;
-		float textY = 800 - MARGIN_SIZE;
+		float textY = 800;
 		TextBounds lastTextBounds = null;
-		for (Iterator<LogEntry> logIterator = this.gameState.gameLog.descendingIterator(); logIterator.hasNext() && logMessageCount < 5; logMessageCount++) {
+		for (Iterator<LogEntry> logIterator = this.gameState.gameLog.descendingIterator(); logIterator.hasNext() && logMessageCount < 10; logMessageCount++) {
 			LogEntry entry = logIterator.next();
-			float color = 1f - logMessageCount*0.15f;
+			float color = 1f - logMessageCount*0.10f;
 			font.setColor(color, color, color, 1f);
 			lastTextBounds = font.drawWrapped(batch, entry.message, MARGIN_SIZE, textY, sideDisplayBounds.width - MARGIN_SIZE * 2);
 			textY -= lastTextBounds.height + TEXT_MARGIN;
@@ -71,7 +71,7 @@ public class SideDisplayRenderer {
 		
 		shapeRenderer.begin(ShapeType.Line);
 		shapeRenderer.setColor(Color.WHITE);
-		shapeRenderer.line(0, 0, 0, sideDisplayBounds.height);
+		shapeRenderer.line(1, 0, 1, sideDisplayBounds.height);
 		shapeRenderer.end();
 	}
 

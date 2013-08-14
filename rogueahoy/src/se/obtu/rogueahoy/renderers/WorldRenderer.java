@@ -1,8 +1,8 @@
 package se.obtu.rogueahoy.renderers;
 
 import se.obtu.rogueahoy.model.entities.PlayerCharacter;
-import se.obtu.rogueahoy.model.world.Level;
 import se.obtu.rogueahoy.model.world.Cell.CellType;
+import se.obtu.rogueahoy.model.world.Level;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
@@ -37,7 +37,7 @@ public class WorldRenderer {
 		
 		defaultTileset = new Texture(Gdx.files.internal("data/16_tileset_transparent.png"));
 		TextureRegion floorRegion = new TextureRegion(defaultTileset, 14 * TILE_SIZE, 2 * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-		TextureRegion wallRegion = new TextureRegion(defaultTileset, 1 * TILE_SIZE, 11*TILE_SIZE, TILE_SIZE, TILE_SIZE);
+		TextureRegion wallRegion = new TextureRegion(defaultTileset, 0 * TILE_SIZE, 11*TILE_SIZE, TILE_SIZE, TILE_SIZE);
 		TextureRegion pcRegion = new TextureRegion(defaultTileset, 0, 4*TILE_SIZE, TILE_SIZE, TILE_SIZE);
 		TextureRegion blank = new TextureRegion(defaultTileset, 11*TILE_SIZE, 13*TILE_SIZE, TILE_SIZE, TILE_SIZE);
 		floorSprite = new Sprite(floorRegion);
