@@ -83,6 +83,8 @@ public class BspDungeonGeneration {
 		
 		if (shouldPartition) {
 			
+			partition.setHorizontalSplit(splitHorizontal);
+			
 			int p1StartX, p1EndX, p1StartY, p1EndY,
 				p2StartX, p2EndX, p2StartY, p2EndY;
 				
@@ -107,7 +109,7 @@ public class BspDungeonGeneration {
 				
 				p1EndY = partition.startY + partitionHeight - 1;
 				p2StartX = partition.startX;
-				p2EndX = partition.endY;
+				p2EndX = partition.endX;
 				p2StartY = p1EndY + 1;
 				p2EndY = partition.endY;
 			}

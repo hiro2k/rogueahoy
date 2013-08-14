@@ -7,6 +7,7 @@ public class DungeonPartition {
 	public int endX;
 	public int endY;
 	private int id;
+	private boolean horizontalSplit = false;
 	
 	private DungeonPartition leftChild;
 	private DungeonPartition rightChild;
@@ -54,7 +55,7 @@ public class DungeonPartition {
 	
 	@Override
 	public String toString() {
-		String string = "Partition: {(" + startX + ", " + startY + "), (" + endX + ", " + endY + ")}"; 
+		String string = "Partition: {(" + startX + ", " + startY + "), (" + endX + ", " + endY + "), id: " + this.id +"}"; 
 		return string;
 	}
 
@@ -64,5 +65,13 @@ public class DungeonPartition {
 
 	public void setId(int id) {
 		this.id = id;
+	}
+
+	public boolean isHorizontalSplit() {
+		return horizontalSplit;
+	}
+
+	public void setHorizontalSplit(boolean horizontalSplit) {
+		this.horizontalSplit = horizontalSplit;
 	}
 }

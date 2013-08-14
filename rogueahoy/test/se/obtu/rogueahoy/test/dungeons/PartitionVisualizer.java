@@ -8,16 +8,15 @@ import se.obtu.rogueahoy.dungeons.DungeonPartition;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 
-public class PartitionVisualizer extends Game {
+public class PartitionVisualizer extends Game implements InputProcessor {
 	
 	private static final int CAMERA_SPEED = 2;
 	private static final float ZOOM_CHUNK = 0.05f;
@@ -26,8 +25,6 @@ public class PartitionVisualizer extends Game {
 	List<DungeonPartition> dungeonPartitions;
 	DungeonPartition rootPartition;
 	ShapeRenderer shapeRenderer;
-	private BitmapFont font;
-	private SpriteBatch spriteBatch;
 	OrthographicCamera camera;
 	int step = 0;
 	private BspDungeonGeneration generator;
@@ -46,23 +43,24 @@ public class PartitionVisualizer extends Game {
 	@Override
 	public void create() {
 		generator = new BspDungeonGeneration();
-		generator.setHeight(25);
-		generator.setWidth(25);
+		generator.setHeight(35);
+		generator.setWidth(35);
 		generator.setMinHeight(4);
 		generator.setMinWidth(4);
 		generator.setMaxHeight(10);
 		generator.setMaxWidth(10);
-		generator.setMinPartitionSize(16);
-		generator.setMaxPartitionSize(25*25);
+		generator.setMinPartitionSize(25);
+		generator.setMaxPartitionSize(15*15);
 		rootPartition = generator.generate(1376447623589l);
 		
 		this.dungeonPartitions = generator.getLeafPartitions();
 		camera = new OrthographicCamera(1280, 800);
-		camera.position.set(15, 15, 0);
+		camera.position.set(35/2, 35/2, 0);
 		camera.zoom = 0.05f;
 		camera.update();
 		
 		shapeRenderer = new ShapeRenderer();
+		Gdx.input.setInputProcessor(this);
 	}
 	
 	@Override
@@ -113,12 +111,59 @@ public class PartitionVisualizer extends Game {
 			camera.zoom = Math.min(ZOOM_MIN, camera.zoom - ZOOM_CHUNK);
 		}
 		
-		if (Gdx.input.isKeyPressed(Keys.R)) {
+		camera.update();
+	}
+
+	@Override
+	public boolean keyDown(int keycode) {
+		if (Keys.R == keycode) {
 			long seed = System.currentTimeMillis();
 			System.out.println("Regenerating with seed: " + seed);
 			this.rootPartition = generator.generate(seed);
 		}
 		
-		camera.update();
+		return false;
+	}
+
+	@Override
+	public boolean keyUp(int keycode) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean keyTyped(char character) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean touchDragged(int screenX, int screenY, int pointer) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean mouseMoved(int screenX, int screenY) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean scrolled(int amount) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 }
