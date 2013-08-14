@@ -135,9 +135,9 @@ public class BspDungeonGeneration {
 			}
 
 			DungeonPartition p1 = new DungeonPartition(p1StartX, p1StartY, p1EndX, p1EndY);
-			p1.setId(++count);
+			p1.setId(count++);
 			DungeonPartition p2 = new DungeonPartition(p2StartX, p2StartY, p2EndX, p2EndY);
-			p2.setId(++count);
+			p2.setId(count++);
 			
 			System.out.println("Partition 1 is " + p1);
 			System.out.println("Partition 2 is " + p2);
