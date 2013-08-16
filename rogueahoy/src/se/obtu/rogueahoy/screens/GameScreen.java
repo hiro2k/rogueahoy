@@ -28,11 +28,11 @@ public class GameScreen implements Screen, InputProcessor {
 	WorldController controller;
 	
 	public GameScreen(RogueahoyGame game) {
-		Level defaultLevel = new Level(50, 50);
-		for (int x = 0; x < 50; x++) {
-			for (int y = 0; y < 50; y++) {
+		Level defaultLevel = new Level(100, 100);
+		for (int x = 0; x < 100; x++) {
+			for (int y = 0; y < 100; y++) {
 				Cell cell = new Cell();
-				if (x == 0 || x == 49 || y == 0 || y == 49) {
+				if (x == 0 || x == 99 || y == 0 || y == 99) {
 					cell.cellType = CellType.Wall;
 				}
 				else {

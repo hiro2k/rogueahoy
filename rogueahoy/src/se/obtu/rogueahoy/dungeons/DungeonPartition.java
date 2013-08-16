@@ -2,6 +2,7 @@ package se.obtu.rogueahoy.dungeons;
 
 import java.util.List;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 
 public class DungeonPartition {
@@ -17,10 +18,10 @@ public class DungeonPartition {
 	private Integer roomStartX;
 	private Integer roomStartY;
 	private List<Vector2> cooridorVertices;
-	private boolean hasRoom = false;
-	
+	private boolean hasRoom = false;	
 	private DungeonPartition leftChild;
 	private DungeonPartition rightChild;
+	private Color color = Color.BLACK;
 	
 	public DungeonPartition(int startX, int startY, int endX, int endY) {
 		this.startX = startX;
@@ -54,6 +55,14 @@ public class DungeonPartition {
 	
 	public int getWidth() {
 		return (endX - startX) + 1;
+	}
+	
+	public int getRoomEndX() {
+		return roomStartX + roomWidth;
+	}
+	
+	public int getRoomEndY() {
+		return roomStartY + roomHeight;
 	}
 	
 	public int getSize() {
@@ -163,5 +172,13 @@ public class DungeonPartition {
 
 	public void setHasRoom(boolean hasRoom) {
 		this.hasRoom = hasRoom;
+	}
+
+	public Color getColor() {
+		return color;
+	}
+
+	public void setColor(Color color) {
+		this.color = color;
 	}
 }

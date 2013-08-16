@@ -1,7 +1,10 @@
 package se.obtu.rogueahoy.test.dungeons;
 
-import java.util.Iterator;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Deque;
 import java.util.List;
+import java.util.Random;
 
 import se.obtu.rogueahoy.dungeons.BspDungeonGeneration;
 import se.obtu.rogueahoy.dungeons.DungeonPartition;
@@ -15,22 +18,25 @@ import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture.TextureFilter;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
-import com.badlogic.gdx.math.Vector2;
 
 public class PartitionVisualizer extends Game implements InputProcessor {
 	
 	private static final int CAMERA_SPEED = 2;
-	private static final float ZOOM_CHUNK = 0.05f;
-	private static final float ZOOM_MIN = 0;
-	private static final float ZOOM_MAX = 1f;
 	List<DungeonPartition> dungeonPartitions;
 	DungeonPartition rootPartition;
 	ShapeRenderer shapeRenderer;
 	OrthographicCamera camera;
-	int step = 0;
 	private BspDungeonGeneration generator;
+	private BitmapFont font;
+	private SpriteBatch batch;
+	Random rand = new Random(1l);
+	private boolean doStep = false;
+	Deque<List<DungeonPartition>> steps;
 
 	public static void main(String[] args) {
 		LwjglApplicationConfiguration cfg = new LwjglApplicationConfiguration();
@@ -48,24 +54,35 @@ public class PartitionVisualizer extends Game implements InputProcessor {
 		generator = new BspDungeonGeneration();
 		generator.setHeight(35);
 		generator.setWidth(35);
-		generator.setMinHeight(4);
-		generator.setMinWidth(4);
-		generator.setMaxHeight(10);
-		generator.setMaxWidth(10);
-		generator.setMinRoomHeight(4);
-		generator.setMinRoomWidth(4);
-		generator.setMinPartitionSize(25);
-		generator.setMaxPartitionSize(15*15);
+		generator.setMinHeight(7);
+		generator.setMinWidth(7);
+		generator.setMaxHeight(17);
+		generator.setMaxWidth(17);
+		generator.setMinRoomHeight(6);
+		generator.setMinRoomWidth(6);
+		generator.setMinPartitionSize(7*7);
+		generator.setMaxPartitionSize(17*17);
 		rootPartition = generator.generate(1376447623589l);
 		
-		this.dungeonPartitions = generator.getLeafPartitions();
+		steps = new ArrayDeque<>();
+		regenerateDungeon();
+		
 		camera = new OrthographicCamera(1280, 800);
-		camera.position.set(35/2, 35/2, 0);
 		camera.zoom = 0.05f;
+		camera.position.set(rootPartition.getWidth()/2, rootPartition.getHeight()/2, 0);
 		camera.update();
 		
+		font = new BitmapFont(Gdx.files.internal("data/default.fnt"), false);
+		font.getRegion().getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
 		shapeRenderer = new ShapeRenderer();
+		batch = new SpriteBatch();
 		Gdx.input.setInputProcessor(this);
+	}
+
+	private void regenerateDungeon() {
+		List<DungeonPartition> currentStep = new ArrayList<>();
+		currentStep.add(rootPartition);
+		steps.add(currentStep);
 	}
 	
 	@Override
@@ -77,38 +94,38 @@ public class PartitionVisualizer extends Game implements InputProcessor {
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 		
 		shapeRenderer.setProjectionMatrix(camera.combined);
-		renderDungeonPartition(rootPartition);
+		for (List<DungeonPartition> step : this.steps) {
+			for (DungeonPartition d : step) {
+				renderDungeonPartition(d);
+			}
+		}
 	}
 
 	private void renderDungeonPartition(DungeonPartition partition) {
-		if (partition.getLeftChild() != null) {
-			renderDungeonPartition(partition.getLeftChild());
-			renderDungeonPartition(partition.getRightChild());
+			
+		if (!partition.isHasRoom()) {
+			shapeRenderer.begin(ShapeType.Line);
+			shapeRenderer.setColor(partition.getColor());
+			shapeRenderer.rect(partition.getStartX(), partition.getStartY(), partition.getWidth(), partition.getHeight());
+			shapeRenderer.end();
 		}
 		else {
+			
 			shapeRenderer.begin(ShapeType.Filled);
 			shapeRenderer.setColor(Color.RED);
 			shapeRenderer.rect(partition.getRoomStartX(), partition.getRoomStartY(), partition.getRoomWidth(), partition.getRoomHeight());
 			shapeRenderer.end();
 			
 			shapeRenderer.begin(ShapeType.Line);
-			shapeRenderer.setColor(Color.WHITE);
+			shapeRenderer.setColor(partition.getColor());
 			shapeRenderer.rect(partition.startX, partition.startY, partition.getWidth(), partition.getHeight());
-			
-			if (partition.getCooridorVertices() != null) {
-				shapeRenderer.setColor(Color.GREEN);
-				Iterator<Vector2> iterator = partition.getCooridorVertices().iterator();
-				Vector2 previousVertex = iterator.next();
-				while (iterator.hasNext()) {
-					shapeRenderer.circle(previousVertex.x, previousVertex.y, 10);
-					Vector2 nextVertex = iterator.next();
-					shapeRenderer.line(previousVertex, nextVertex);
-					
-					previousVertex = nextVertex;
-				}
-			}
-			
 			shapeRenderer.end();
+
+			batch.setProjectionMatrix(camera.combined);
+			font.setScale(camera.zoom*2, camera.zoom);
+			batch.begin();
+			font.draw(batch, Integer.toString(partition.getId()), partition.startX, partition.startY + 1);
+			batch.end();
 		}
 	}
 
@@ -126,15 +143,28 @@ public class PartitionVisualizer extends Game implements InputProcessor {
 			camera.position.x -= CAMERA_SPEED;
 		}
 		
-		if (Gdx.input.isKeyPressed(Keys.S)) {
-			step = (step + 1) % this.dungeonPartitions.size();
-		}
-		
-		if (Gdx.input.isKeyPressed(Keys.PLUS)) {
-			camera.zoom = Math.min(ZOOM_MIN, camera.zoom - ZOOM_CHUNK);
+		if (Gdx.input.isKeyPressed(Keys.ESCAPE)) {
+			Gdx.app.exit();
 		}
 		
 		camera.update();
+		
+		if (doStep) {
+			List<DungeonPartition> cs = steps.getLast();
+			List<DungeonPartition> nextStep = new ArrayList<>();
+			for (DungeonPartition d : cs) {
+				if (d.getLeftChild() != null) {
+					nextStep.add(d.getLeftChild());
+					nextStep.add(d.getRightChild());
+				}
+			}
+			
+			if (!nextStep.isEmpty()) {
+				steps.addLast(nextStep);
+			}
+			
+			doStep = false;
+		}
 	}
 
 	@Override
@@ -143,6 +173,18 @@ public class PartitionVisualizer extends Game implements InputProcessor {
 			long seed = System.currentTimeMillis();
 			System.out.println("Regenerating with seed: " + seed);
 			this.rootPartition = generator.generate(seed);
+			steps = new ArrayDeque<>();
+			regenerateDungeon();
+		}
+		
+		if (Keys.S == keycode) {
+			doStep = true;
+		}
+		
+		if (Keys.P == keycode) {
+			if (steps.size() > 1) {
+				steps.removeLast();
+			}
 		}
 		
 		return false;

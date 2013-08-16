@@ -6,7 +6,7 @@ import java.util.Deque;
 import java.util.List;
 import java.util.Random;
 
-import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.graphics.Color;
 
 public class BspDungeonGeneration {
 	
@@ -32,6 +32,7 @@ public class BspDungeonGeneration {
 		partitionQueue = new ArrayDeque<>();
 		
 		DungeonPartition startingPartition = new DungeonPartition();
+		startingPartition.setColor(new Color(random.nextFloat(), random.nextFloat(), random.nextFloat(), 1));
 		startingPartition.startX = 0;
 		startingPartition.startY = 0;
 		startingPartition.endX = width - 1;
@@ -54,7 +55,7 @@ public class BspDungeonGeneration {
 			fillPartitions(partition.getLeftChild());
 			fillPartitions(partition.getRightChild());
 			
-			//joinRooms(partition.getLeftChild(), partition.getRightChild(), partition.isHorizontalSplit(), partition);
+			joinRooms(partition.getLeftChild(), partition.getRightChild(), partition.isHorizontalSplit(), partition);
 		}
 		else {
 			//No children, fill this partition with a room
@@ -65,7 +66,8 @@ public class BspDungeonGeneration {
 	private void joinRooms(DungeonPartition leftChild,
 			DungeonPartition rightChild, boolean horizontalSplit, DungeonPartition parent) 
 	{
-		if ()
+		PartitionJoiner joiner = new PartitionJoiner();
+		joiner.joinPartitions(leftChild, rightChild, parent);
 	}
 
 	private void addRoom(DungeonPartition partition) {
@@ -196,8 +198,10 @@ public class BspDungeonGeneration {
 
 			p1 = new DungeonPartition(p1StartX, p1StartY, p1EndX, p1EndY);
 			p1.setId(count++);
+			p1.setColor(new Color(random.nextFloat(), random.nextFloat(), random.nextFloat(), 1));
 			p2 = new DungeonPartition(p2StartX, p2StartY, p2EndX, p2EndY);
 			p2.setId(count++);
+			p2.setColor(new Color(random.nextFloat(), random.nextFloat(), random.nextFloat(), 1));
 			
 			partitionQueue.push(p1);
 			partitionQueue.push(p2);
