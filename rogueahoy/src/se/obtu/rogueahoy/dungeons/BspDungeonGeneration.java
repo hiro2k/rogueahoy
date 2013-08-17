@@ -6,6 +6,8 @@ import java.util.Deque;
 import java.util.List;
 import java.util.Random;
 
+import scala.Some;
+
 import com.badlogic.gdx.graphics.Color;
 
 public class BspDungeonGeneration {
@@ -31,14 +33,8 @@ public class BspDungeonGeneration {
 		leafPartitions = new ArrayList<>();
 		partitionQueue = new ArrayDeque<>();
 		
-		DungeonPartition startingPartition = new DungeonPartition();
-		startingPartition.setColor(new Color(random.nextFloat(), random.nextFloat(), random.nextFloat(), 1));
-		startingPartition.startX = 0;
-		startingPartition.startY = 0;
-		startingPartition.endX = width - 1;
-		startingPartition.endY = height - 1;
-		startingPartition.setId(count);
-		count++;
+		DungeonPartition startingPartition = new DungeonPartition(
+				0, 0, width, height, count++);
 		
 		partitionQueue.push(startingPartition);
 		while(partitionQueue.peek() != null) {
@@ -51,11 +47,11 @@ public class BspDungeonGeneration {
 	}
 	
 	public void fillPartitions(DungeonPartition partition) {
-		if (partition.getLeftChild() != null) {
-			fillPartitions(partition.getLeftChild());
-			fillPartitions(partition.getRightChild());
+		if (partition.getLeftChild().isDefined()) {
+			fillPartitions(partition.getLeftChild().get());
+			fillPartitions(partition.getRightChild().get());
 			
-			joinRooms(partition.getLeftChild(), partition.getRightChild(), partition.isHorizontalSplit(), partition);
+			joinRooms(partition.getLeftChild().get(), partition.getRightChild().get(), partition.horizontalSplit(), partition);
 		}
 		else {
 			//No children, fill this partition with a room
@@ -66,43 +62,37 @@ public class BspDungeonGeneration {
 	private void joinRooms(DungeonPartition leftChild,
 			DungeonPartition rightChild, boolean horizontalSplit, DungeonPartition parent) 
 	{
-		PartitionJoiner joiner = new PartitionJoiner();
-		joiner.joinPartitions(leftChild, rightChild, parent);
+		//sPartitionJoiner joiner = new PartitionJoiner();
 	}
 
 	private void addRoom(DungeonPartition partition) {
 
-		int roomWidth = this.randomInRange(minRoomWidth, partition.getWidth(), random);
-		int roomHeight = this.randomInRange(minRoomHeight, partition.getHeight(), random);
+		int roomWidth = this.randomInRange(minRoomWidth, partition.width(), random);
+		int roomHeight = this.randomInRange(minRoomHeight, partition.height(), random);
 		
 		//find a placement for the room that doesn't violate the partitions bounds
 		boolean xPlacementFound = false;
 		Integer roomStartX = null;
 		while (!xPlacementFound) {
-			int startX = randomInRange(partition.startX, partition.endX, random);
-			if (startX + roomWidth <= partition.endX + 1) {
+			int startX = randomInRange(partition.startX(), partition.endX(), random);
+			if (startX + roomWidth <= partition.endX() + 1) {
 				roomStartX = new Integer(startX);
 				xPlacementFound = true;
 			}
 		}
 		
-		partition.setRoomWidth(roomWidth);
-		partition.setRoomStartX(roomStartX);
-		
 		boolean yPlacementFound = false;
 		Integer roomStartY = null;
 		while (!yPlacementFound) {
-			int startY = randomInRange(partition.startY, partition.endY, random);
-			if (startY + roomHeight <= partition.endY + 1) {
+			int startY = randomInRange(partition.startY(), partition.endY(), random);
+			if (startY + roomHeight <= partition.endY() + 1) {
 				roomStartY = new Integer(startY);
 				yPlacementFound = true;
 			}
 		}
 		
-		partition.setRoomHeight(roomHeight);
-		partition.setRoomStartY(roomStartY);
-		
-		partition.setHasRoom(true);
+		Room room = new Room(roomStartX, roomStartY, roomWidth, roomHeight);
+		partition.setRoom(new Some<Room>(room));
 	}
 
 	private int randomInRange(int min, int max, Random random) {
@@ -112,14 +102,14 @@ public class BspDungeonGeneration {
 
 	private boolean partitionDungeon(DungeonPartition partition) {
 		boolean shouldPartition = true;
-		int partitionSize = partition.getSize();
+		int partitionSize = partition.size();
 		
 		if (partitionSize <= minPartitionSize) {
 			shouldPartition = false;
 		}
 		
-		int currentPartitionHeight = partition.getHeight();
-		int currentPartitionWidth = partition.getWidth();
+		int currentPartitionHeight = partition.height();
+		int currentPartitionWidth = partition.width();
 		
 		boolean splitHorizontal = random.nextBoolean();
 		if (currentPartitionHeight/2 < minHeight) {
@@ -152,15 +142,15 @@ public class BspDungeonGeneration {
 				
 			//Determine the start coords of the bottom partition
 			if (splitHorizontal) {
-				p1StartX = partition.startX;
-				p1StartY = partition.startY;
-				p1EndX = partition.endX;
+				p1StartX = partition.startX();
+				p1StartY = partition.startY();
+				p1EndX = partition.endX();
 				
 				int partitionHeight = -1;
 				boolean goodHeightFound = false;
 				while (!goodHeightFound) {
 					partitionHeight = this.randomInRange(minHeight, Math.max(maxHeight, currentPartitionHeight), random);
-					int potentialP2Height = (partition.endY - (partition.startY + partitionHeight)) + 1;
+					int potentialP2Height = (partition.endY() - (partition.startY() + partitionHeight)) + 1;
 					if (potentialP2Height >= minHeight) {
 						goodHeightFound = true;
 					}
@@ -168,46 +158,44 @@ public class BspDungeonGeneration {
 				
 				assert(partitionHeight > 0);
 				
-				p1EndY = partition.startY + partitionHeight - 1;
-				p2StartX = partition.startX;
-				p2EndX = partition.endX;
+				p1EndY = partition.startY() + partitionHeight - 1;
+				p2StartX = partition.startX();
+				p2EndX = partition.endX();
 				p2StartY = p1EndY + 1;
-				p2EndY = partition.endY;
+				p2EndY = partition.endY();
 			}
 			else {
-				p1StartX = partition.startX;
-				p1StartY = partition.startY;
-				p1EndY = partition.endY;
+				p1StartX = partition.startX();
+				p1StartY = partition.startY();
+				p1EndY = partition.endY();
 				
 				int newPartitionWidth = -1;
 				boolean goodWidthFound = false;
 				while (!goodWidthFound) {
 					newPartitionWidth = this.randomInRange(minWidth, Math.min(maxWidth, currentPartitionWidth), random);
-					int potentialP2Width = (partition.endX - (partition.startX + newPartitionWidth)) + 1;
+					int potentialP2Width = (partition.endX() - (partition.startX() + newPartitionWidth)) + 1;
 					if (potentialP2Width >= minWidth) {
 						goodWidthFound = true;
 					}
 				}
 				
-				p1EndX = partition.startX + newPartitionWidth - 1;	
+				p1EndX = partition.startX() + newPartitionWidth - 1;	
 				p2StartX = p1EndX + 1;
-				p2EndX = partition.endX;
-				p2StartY = partition.startY;
-				p2EndY = partition.endY;
+				p2EndX = partition.endX();
+				p2StartY = partition.startY();
+				p2EndY = partition.endY();
 			}
 
-			p1 = new DungeonPartition(p1StartX, p1StartY, p1EndX, p1EndY);
-			p1.setId(count++);
+			p1 = new DungeonPartition(p1StartX, p1StartY, p1EndX, p1EndY, count++);
 			p1.setColor(new Color(random.nextFloat(), random.nextFloat(), random.nextFloat(), 1));
-			p2 = new DungeonPartition(p2StartX, p2StartY, p2EndX, p2EndY);
-			p2.setId(count++);
+			p2 = new DungeonPartition(p2StartX, p2StartY, p2EndX, p2EndY, count++);
 			p2.setColor(new Color(random.nextFloat(), random.nextFloat(), random.nextFloat(), 1));
 			
 			partitionQueue.push(p1);
 			partitionQueue.push(p2);
 			
-			partition.setLeftChild(p1);
-			partition.setRightChild(p2);
+			partition.setLeftChild(new Some<DungeonPartition>(p1));
+			partition.setRightChild(new Some<DungeonPartition>(p2));
 			
 			return true;
 		}
