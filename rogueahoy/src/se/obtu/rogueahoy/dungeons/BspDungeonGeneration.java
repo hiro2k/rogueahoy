@@ -62,7 +62,8 @@ public class BspDungeonGeneration {
 	private void joinRooms(DungeonPartition leftChild,
 			DungeonPartition rightChild, boolean horizontalSplit, DungeonPartition parent) 
 	{
-		//sPartitionJoiner joiner = new PartitionJoiner();
+		PartitionJoiner joiner = new PartitionJoiner();
+		joiner.joinPartitions(leftChild, rightChild, parent);
 	}
 
 	private void addRoom(DungeonPartition partition) {
@@ -91,7 +92,7 @@ public class BspDungeonGeneration {
 			}
 		}
 		
-		Room room = new Room(roomStartX, roomStartY, roomWidth, roomHeight);
+		Room room = new Room(roomStartX, roomStartY, roomWidth, roomHeight, partition.getId());
 		partition.setRoom(new Some<Room>(room));
 	}
 

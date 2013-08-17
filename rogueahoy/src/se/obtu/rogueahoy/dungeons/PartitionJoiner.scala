@@ -25,8 +25,23 @@ class PartitionJoiner {
 			//if the rooms are adjacent and overlap by more than two cells we can just put a "door"
 			//between them
 			if (leftRoom.adjacentY(rightRoom)) {
-				if (leftRoom.overlapX(rightRoom) > 2) {
+				var xOverlap = leftRoom overlapX rightRoom;
+				if (xOverlap > 2) {
+					Log.logger.debug(s"Parent $parentPartition");
 					Log.logger.debug(s"Rooms $leftRoom and $rightRoom have a south-north door");
+				}
+				else {
+					Log.logger.debug(s"Rooms $leftRoom and $rightRoom need a wacky corridor!");
+				}
+			}
+			else {
+				Log.logger.debug(s"Rooms $leftRoom and $rightRoom can use a regular north south corridor");
+			}
+		}
+		else {
+			if (leftRoom.adjacentX(rightRoom)) {
+				if (leftRoom.overlapY(rightRoom) > 2) {
+					Log.logger.debug(s"Rooms $leftRoom and $rightRoom have a east-west door");
 				}
 			}
 		}

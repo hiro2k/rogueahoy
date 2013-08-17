@@ -6,10 +6,11 @@ class Room(
 	@BeanProperty var startX: Int,
 	@BeanProperty var startY: Int,
 	@BeanProperty var width: Int,
-	@BeanProperty var height: Int) {
+	@BeanProperty var height: Int,
+	@BeanProperty var parentId: Int) {
 
-	def endX = startX + width;
-	def endY = startY + height;
+	def endX = startX + width - 1;
+	def endY = startY + height - 1;
 	
 	/**
 	 * Whether the given room is "adjacent" to this room on the Y axis. That is, their borders
@@ -25,7 +26,15 @@ class Room(
 		this.endX - rightRoom.startX;
 	}
 	
+	def overlapY(topRoom: Room): Int = {
+		this.endY - topRoom.startY;
+	}
+	
 	def overlapX(rightRoom: Room, by: Int): Boolean = {
 		this.overlapX(rightRoom) == by;
+	}
+	
+	override def toString(): String = {
+		s"{($startX, $startY)-($endX, $endY), parentId: $parentId}";
 	}
 }

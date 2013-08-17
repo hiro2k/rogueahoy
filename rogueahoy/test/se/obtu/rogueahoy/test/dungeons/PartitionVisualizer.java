@@ -63,7 +63,7 @@ public class PartitionVisualizer extends Game implements InputProcessor {
 		generator.setMinRoomWidth(6);
 		generator.setMinPartitionSize(7*7);
 		generator.setMaxPartitionSize(17*17);
-		rootPartition = generator.generate(1376447623589l);
+		rootPartition = generator.generate(1376728261342l);
 		
 		steps = new ArrayDeque<>();
 		regenerateDungeon();

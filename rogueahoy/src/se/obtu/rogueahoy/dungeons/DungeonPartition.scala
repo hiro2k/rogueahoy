@@ -21,4 +21,8 @@ class DungeonPartition(
 	def height = (endY - startY) + 1;
 	def width = (endX - startX) + 1;
 	def size = width * height;
+	
+	override def toString(): String = {
+		s"{($startX, $startY)-($endX, $endY), id: $id}";
+	}
 }
