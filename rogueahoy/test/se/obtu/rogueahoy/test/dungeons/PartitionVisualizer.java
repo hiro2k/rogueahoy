@@ -1,5 +1,6 @@
 package se.obtu.rogueahoy.test.dungeons;
 
+import java.io.File;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -7,7 +8,13 @@ import java.util.List;
 import java.util.Random;
 
 import se.obtu.rogueahoy.dungeons.BspDungeonGeneration;
+import se.obtu.rogueahoy.dungeons.Cell;
 import se.obtu.rogueahoy.dungeons.DungeonPartition;
+import se.obtu.rogueahoy.dungeons.DungeonPrinter;
+import se.obtu.rogueahoy.dungeons.DungeonTransformer;
+import se.obtu.rogueahoy.dungeons.Level;
+import se.obtu.rogueahoy.dungeons.PartitionJoiner;
+import se.obtu.rogueahoy.dungeons.Partitions;
 import se.obtu.rogueahoy.dungeons.Room;
 
 import com.badlogic.gdx.Game;
@@ -64,6 +71,12 @@ public class PartitionVisualizer extends Game implements InputProcessor {
 		generator.setMinPartitionSize(7*7);
 		generator.setMaxPartitionSize(17*17);
 		rootPartition = generator.generate(1376728261342l);
+		Cell[][] map = DungeonTransformer.transformDungeonToLevel(rootPartition);
+		Level level = new Level(map);
+		PartitionJoiner partitionJoiner = new PartitionJoiner(level);
+		partitionJoiner.joinDungeon(rootPartition);
+		
+		DungeonPrinter.printLevel(new File("test.txt"), level);
 		
 		steps = new ArrayDeque<>();
 		regenerateDungeon();
@@ -104,14 +117,14 @@ public class PartitionVisualizer extends Game implements InputProcessor {
 
 	private void renderDungeonPartition(DungeonPartition partition) {
 			
-		if (!partition.getRoom().isDefined()) {
+		if (!(partition.contents() instanceof Room)) {
 			shapeRenderer.begin(ShapeType.Line);
 			shapeRenderer.setColor(partition.color());
 			shapeRenderer.rect(partition.getStartX(), partition.getStartY(), partition.width(), partition.height());
 			shapeRenderer.end();
 		}
 		else {
-			Room room = partition.room().get();
+			Room room = (Room) partition.contents();
 			
 			shapeRenderer.begin(ShapeType.Filled);
 			shapeRenderer.setColor(Color.RED);
@@ -126,8 +139,10 @@ public class PartitionVisualizer extends Game implements InputProcessor {
 			batch.setProjectionMatrix(camera.combined);
 			font.setScale(camera.zoom*2, camera.zoom);
 			batch.begin();
-			font.draw(batch, Integer.toString(partition.getId()), partition.startX(), partition.startY() + 1);
+			font.draw(batch, Integer.toString(partition.getId()), partition.getStartX(), partition.getStartY() + 1);
 			batch.end();
+			
+			camera.update();
 		}
 	}
 
@@ -155,9 +170,10 @@ public class PartitionVisualizer extends Game implements InputProcessor {
 			List<DungeonPartition> cs = steps.getLast();
 			List<DungeonPartition> nextStep = new ArrayList<>();
 			for (DungeonPartition d : cs) {
-				if (d.getLeftChild().isDefined()) {
-					nextStep.add(d.getLeftChild().get());
-					nextStep.add(d.getRightChild().get());
+				if (d.hasPartitions()) {
+					Partitions p = (Partitions) d.contents();
+					nextStep.add(p.leftChild());
+					nextStep.add(p.rightChild());
 				}
 			}
 			
@@ -175,6 +191,9 @@ public class PartitionVisualizer extends Game implements InputProcessor {
 			long seed = System.currentTimeMillis();
 			System.out.println("Regenerating with seed: " + seed);
 			this.rootPartition = generator.generate(seed);
+			Level level = generator.getLevel();
+			
+			DungeonPrinter.printLevel(new File("test.txt"), level);
 			steps = new ArrayDeque<>();
 			regenerateDungeon();
 		}

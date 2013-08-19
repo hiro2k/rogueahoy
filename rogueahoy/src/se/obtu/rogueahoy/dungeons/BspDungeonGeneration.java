@@ -1,12 +1,8 @@
 package se.obtu.rogueahoy.dungeons;
 
 import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.Deque;
-import java.util.List;
 import java.util.Random;
-
-import scala.Some;
 
 import com.badlogic.gdx.graphics.Color;
 
@@ -24,17 +20,17 @@ public class BspDungeonGeneration {
 	private int minRoomHeight;
 	private long randomSeed;
 	private Random random;
-	private List<DungeonPartition> leafPartitions;
 	private Deque<DungeonPartition> partitionQueue;
+	private PartitionJoiner joiner;
+	private Level level;
 	private int count = 0;
 
 	public DungeonPartition generate(long randomSeed) {
 		random = new Random(randomSeed);
-		leafPartitions = new ArrayList<>();
 		partitionQueue = new ArrayDeque<>();
 		
 		DungeonPartition startingPartition = new DungeonPartition(
-				0, 0, width, height, count++);
+				0, 0, width - 1, height - 1, count++);
 		
 		partitionQueue.push(startingPartition);
 		while(partitionQueue.peek() != null) {
@@ -42,28 +38,20 @@ public class BspDungeonGeneration {
 		}
 		
 		fillPartitions(startingPartition);
-		
 		return startingPartition;
 	}
 	
 	public void fillPartitions(DungeonPartition partition) {
-		if (partition.getLeftChild().isDefined()) {
-			fillPartitions(partition.getLeftChild().get());
-			fillPartitions(partition.getRightChild().get());
-			
-			joinRooms(partition.getLeftChild().get(), partition.getRightChild().get(), partition.horizontalSplit(), partition);
+		
+		if (partition.hasPartitions()) {
+			Partitions p = (Partitions) partition.contents();
+			fillPartitions(p.leftChild());
+			fillPartitions(p.rightChild());
 		}
 		else {
 			//No children, fill this partition with a room
 			addRoom(partition);
 		}
-	}
-	
-	private void joinRooms(DungeonPartition leftChild,
-			DungeonPartition rightChild, boolean horizontalSplit, DungeonPartition parent) 
-	{
-		PartitionJoiner joiner = new PartitionJoiner();
-		joiner.joinPartitions(leftChild, rightChild, parent);
 	}
 
 	private void addRoom(DungeonPartition partition) {
@@ -93,7 +81,7 @@ public class BspDungeonGeneration {
 		}
 		
 		Room room = new Room(roomStartX, roomStartY, roomWidth, roomHeight, partition.getId());
-		partition.setRoom(new Some<Room>(room));
+		partition.setContents(room);
 	}
 
 	private int randomInRange(int min, int max, Random random) {
@@ -192,11 +180,9 @@ public class BspDungeonGeneration {
 			p2 = new DungeonPartition(p2StartX, p2StartY, p2EndX, p2EndY, count++);
 			p2.setColor(new Color(random.nextFloat(), random.nextFloat(), random.nextFloat(), 1));
 			
-			partitionQueue.push(p1);
-			partitionQueue.push(p2);
-			
-			partition.setLeftChild(new Some<DungeonPartition>(p1));
-			partition.setRightChild(new Some<DungeonPartition>(p2));
+			partitionDungeon(p1);
+			partitionDungeon(p2);
+			partition.setContents(new Partitions(p1, p2));
 			
 			return true;
 		}
@@ -285,14 +271,6 @@ public class BspDungeonGeneration {
 		this.random = random;
 	}
 
-	public List<DungeonPartition> getLeafPartitions() {
-		return leafPartitions;
-	}
-
-	public void setLeafPartitions(List<DungeonPartition> leafPartitions) {
-		this.leafPartitions = leafPartitions;
-	}
-
 	public Deque<DungeonPartition> getPartitionQueue() {
 		return partitionQueue;
 	}
@@ -315,5 +293,13 @@ public class BspDungeonGeneration {
 
 	public void setMinRoomHeight(int minRoomHeight) {
 		this.minRoomHeight = minRoomHeight;
+	}
+
+	public Level getLevel() {
+		return level;
+	}
+
+	public void setLevel(Level level) {
+		this.level = level;
 	}
 }

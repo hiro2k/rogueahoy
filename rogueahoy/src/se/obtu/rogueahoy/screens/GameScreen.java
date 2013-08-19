@@ -50,7 +50,7 @@ public class GameScreen implements Screen, InputProcessor {
 		GameState gameState = new GameState(defaultLevel, pc, new GameLog(50));
 		TurnManager turnManager = new TurnManager(gameState.gameLog);
 		
-		renderer = new WorldRenderer(defaultLevel, pc);
+		//renderer = new WorldRenderer(defaultLevel, pc);
 		
 		Rectangle sideDisplayBounds = new Rectangle(1280-SIDE_MENU_WIDTH, 0, SIDE_MENU_WIDTH, 800);
 		sideDisplayRenderer = new SideDisplayRenderer(sideDisplayBounds, gameState);

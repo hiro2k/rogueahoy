@@ -2,12 +2,12 @@ package se.obtu.rogueahoy.dungeons
 
 import scala.beans.BeanProperty
 
-class Room(
+case class Room(
 	@BeanProperty var startX: Int,
 	@BeanProperty var startY: Int,
 	@BeanProperty var width: Int,
 	@BeanProperty var height: Int,
-	@BeanProperty var parentId: Int) {
+	@BeanProperty var parentId: Int) extends PartitionContents {
 
 	def endX = startX + width - 1;
 	def endY = startY + height - 1;

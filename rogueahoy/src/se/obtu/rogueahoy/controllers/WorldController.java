@@ -2,7 +2,6 @@ package se.obtu.rogueahoy.controllers;
 
 import se.obtu.rogueahoy.model.GameState;
 import se.obtu.rogueahoy.model.entities.PlayerCharacter;
-import se.obtu.rogueahoy.model.logging.GameLog;
 import se.obtu.rogueahoy.tbs.MoveAction;
 import se.obtu.rogueahoy.tbs.TurnManager;
 
@@ -13,13 +12,11 @@ import com.badlogic.gdx.math.Vector2;
 public class WorldController extends InputAdapter {
 	
 	private PlayerCharacter pc;
-	private GameLog gameLog;
 	private TurnManager turnManager;
 	private GameState state;
 	
 	public WorldController(GameState gameState, TurnManager turnManager) {
 		this.pc = gameState.playerCharacter;
-		this.gameLog = gameState.gameLog;
 		this.turnManager = turnManager;
 		this.state = gameState;
 	}
