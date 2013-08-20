@@ -90,9 +90,9 @@ object AStarPathfinding {
 	def cellAt(level: Level, pos: (Int, Int)) = level.map(pos._1)(pos._2);
 
 	def gScoreForCell(cell: Cell) = cell match {
-		case Floor => 5;
-		case Wall => 6;
-		case EmptyCell => 10;
+		case Floor() => 5;
+		case Wall() => 6;
+		case EmptyCell() => 10;
 	}
 
 	def manhattenH(start: (Int, Int), end: (Int, Int)) =

@@ -4,6 +4,7 @@ import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.graphics.Color
 import scala.beans.BeanProperty
 import scala.None
+import scala.util.Random
 
 abstract class PartitionContents;
 case class Partitions(var leftChild: DungeonPartition, var rightChild: DungeonPartition) extends PartitionContents;
@@ -35,6 +36,15 @@ class DungeonPartition(
 		contents match {
 			case r: Room => r;
 			case p: Partitions => p.rightChild.rightmostGrandchild();
+		}
+	}
+	
+	def randomRoom(): Room = {
+		contents match {
+			case r:Room if Random.nextBoolean => r;
+			case Partitions(_, rightChild) if Random.nextBoolean => rightChild.randomRoom
+			case Partitions(leftChild, rightChild) => leftChild.randomRoom
+			case r:Room => r;
 		}
 	}
 	

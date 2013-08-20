@@ -12,7 +12,7 @@ class PathfindingTest extends FlatSpec {
 	def fixture = {
 		new {
 			//create a 35*35 level of all empty squares
-			val map: Array[Array[Cell]] = Array.fill(35, 35){EmptyCell};
+			val map: Array[Array[Cell]] = Array.fill(35, 35){EmptyCell()};
 			val emptyLevel = new Level(map);
 			
 			var pfe1 = new PathfindingEntry((0,0), 0, 0, None);

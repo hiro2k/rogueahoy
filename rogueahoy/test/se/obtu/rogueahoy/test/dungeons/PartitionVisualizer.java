@@ -187,26 +187,25 @@ public class PartitionVisualizer extends Game implements InputProcessor {
 
 	@Override
 	public boolean keyDown(int keycode) {
-		if (Keys.R == keycode) {
-			long seed = System.currentTimeMillis();
-			System.out.println("Regenerating with seed: " + seed);
-			this.rootPartition = generator.generate(seed);
-			Level level = generator.getLevel();
-			
-			DungeonPrinter.printLevel(new File("test.txt"), level);
-			steps = new ArrayDeque<>();
-			regenerateDungeon();
-		}
-		
-		if (Keys.S == keycode) {
-			doStep = true;
-		}
-		
-		if (Keys.P == keycode) {
-			if (steps.size() > 1) {
-				steps.removeLast();
-			}
-		}
+//		if (Keys.R == keycode) {
+//			long seed = System.currentTimeMillis();
+//			System.out.println("Regenerating with seed: " + seed);
+//			this.rootPartition = generator.generate(seed);
+//			
+//			DungeonPrinter.printLevel(new File("test.txt"), level);
+//			steps = new ArrayDeque<>();
+//			regenerateDungeon();
+//		}
+//		
+//		if (Keys.S == keycode) {
+//			doStep = true;
+//		}
+//		
+//		if (Keys.P == keycode) {
+//			if (steps.size() > 1) {
+//				steps.removeLast();
+//			}
+//		}
 		
 		return false;
 	}

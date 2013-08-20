@@ -14,9 +14,9 @@ object DungeonPrinter {
 			for (y <- Range(0, level.map(x).size)) {
 				val cell = level.map(x)(y);
 				val char = cell match {
-					case EmptyCell => " "
-					case Wall => "#"
-					case Floor => "."
+					case EmptyCell() => " "
+					case Wall() => "#"
+					case Floor() => "."
 				}
 				fileWriter.write(char);
 			}

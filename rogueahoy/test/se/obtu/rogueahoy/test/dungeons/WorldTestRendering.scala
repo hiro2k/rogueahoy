@@ -12,6 +12,7 @@ import com.badlogic.gdx.math.Rectangle
 import se.obtu.rogueahoy.dungeons.DungeonTransformer
 import se.obtu.rogueahoy.dungeons.PartitionJoiner
 import com.badlogic.gdx.Input.Keys
+import se.obtu.rogueahoy.dungeons.DungeonGeneration
 
 object WorldTestRendering extends App {
 	var cfg = new LwjglApplicationConfiguration();
@@ -21,32 +22,13 @@ object WorldTestRendering extends App {
 	cfg.height = 800;
 	cfg.resizable = false;
 	
-	var generator = new BspDungeonGeneration();
-	generator.setHeight(40);
-	generator.setWidth(40);
-	generator.setMinHeight(7);
-	generator.setMinWidth(7);
-	generator.setMaxHeight(17);
-	generator.setMaxWidth(17);
-	generator.setMinRoomHeight(6);
-	generator.setMinRoomWidth(6);
-	generator.setMinPartitionSize(7*7);
-	generator.setMaxPartitionSize(17*17);
-	var rootPartition = generator.generate(1376728261342l);
-	var map = DungeonTransformer.transformDungeonToLevel(rootPartition);
-	var level = new Level(map);
-	var partitionJoiner = new PartitionJoiner(level);
-	partitionJoiner.joinDungeon(rootPartition);
-	
-	var renderer = new WorldRenderer(level);
-	
-	var game = new WorldTestRendering(level);
+	var game = new WorldTestRendering();
 
 	new LwjglApplication(game, cfg);
 }
 
-class WorldTestRendering(var level: Level) extends Game {
-	val worldRenderer: WorldRenderer = new WorldRenderer(level);
+class WorldTestRendering() extends Game {
+	val worldRenderer: WorldRenderer = new WorldRenderer(DungeonGeneration.randomStartState);
 	var wasRDown = false;
 	
 	override def create(): Unit = {

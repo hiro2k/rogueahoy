@@ -34,7 +34,7 @@ class PrintTest extends FlatSpec {
 	}
 	
 	"The dungeon printer" should "print a 5x5 dungeon starting at 0x0" in {
-		var map: Array[Array[Cell]] = Array.fill(35, 35){ EmptyCell }
+		var map: Array[Array[Cell]] = Array.fill(35, 35){ EmptyCell() }
 		
 		var room = new Room(0, 0, 5, 5, 0);
 		var room2 = new Room(0, 30, 5, 5, 0);

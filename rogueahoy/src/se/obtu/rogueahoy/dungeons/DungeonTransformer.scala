@@ -5,7 +5,7 @@ import scala.collection.mutable;
 object DungeonTransformer {
 
 	def transformDungeonToLevel(rootPartition: DungeonPartition): Array[Array[Cell]] = {
-		var dungeonArray = Array.fill[Cell](rootPartition.width, rootPartition.height) { Wall }
+		var dungeonArray = Array.fill[Cell](rootPartition.height, rootPartition.width) { Wall() }
 		addPartitionToLevel(rootPartition, dungeonArray);
 		dungeonArray
 	}
@@ -21,13 +21,13 @@ object DungeonTransformer {
 	}
 	
 	def addRoomToLevel(room: Room, level: Array[Array[Cell]]): Unit = {
-		for (y <- room.startX to room.endX) {
-			for (x <- room.startY to room.endY) {
+		for (y <- room.startY to room.endY) {
+			for (x <- room.startX to room.endX) {
 				var cell = 
-					if (y > room.startX && y < room.endX && x > room.startY && x < room.endY) Floor
-					else Wall
+					if (x > room.startX && x < room.endX && y > room.startY && y < room.endY) Floor()
+					else Wall()
 					
-				level(x)(y) = cell;
+				level(y)(x) = cell;
 			}
 		}
 	}

@@ -21,8 +21,6 @@ public class BspDungeonGeneration {
 	private long randomSeed;
 	private Random random;
 	private Deque<DungeonPartition> partitionQueue;
-	private PartitionJoiner joiner;
-	private Level level;
 	private int count = 0;
 
 	public DungeonPartition generate(long randomSeed) {
@@ -293,13 +291,5 @@ public class BspDungeonGeneration {
 
 	public void setMinRoomHeight(int minRoomHeight) {
 		this.minRoomHeight = minRoomHeight;
-	}
-
-	public Level getLevel() {
-		return level;
-	}
-
-	public void setLevel(Level level) {
-		this.level = level;
 	}
 }

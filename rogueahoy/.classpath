@@ -17,6 +17,7 @@
 			<attribute name="javadoc_location" value="jar:platform:/resource/rogueahoy/libs/scalatest_2.10-2.0.M5b-scaladoc.jar!/"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="libs/rlforj.0.3.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
