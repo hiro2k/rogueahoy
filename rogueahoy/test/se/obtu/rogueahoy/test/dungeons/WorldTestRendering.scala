@@ -7,12 +7,13 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.GL10
 import se.obtu.rogueahoy.dungeons.BspDungeonGeneration
 import se.obtu.rogueahoy.dungeons.Level
-import se.obtu.rogueahoy.renderers.WorldRenderer
 import com.badlogic.gdx.math.Rectangle
 import se.obtu.rogueahoy.dungeons.DungeonTransformer
 import se.obtu.rogueahoy.dungeons.PartitionJoiner
 import com.badlogic.gdx.Input.Keys
 import se.obtu.rogueahoy.dungeons.DungeonGeneration
+import com.badlogic.gdx.scenes.scene2d.Stage
+import se.obtu.rogueahoy.scene.WorldRenderer
 
 object WorldTestRendering extends App {
 	var cfg = new LwjglApplicationConfiguration();
@@ -28,11 +29,14 @@ object WorldTestRendering extends App {
 }
 
 class WorldTestRendering() extends Game {
-	val worldRenderer: WorldRenderer = new WorldRenderer(DungeonGeneration.randomStartState);
+	var worldRenderer: Option[WorldRenderer] = None;
+	var stage: Option[Stage] = None;
 	var wasRDown = false;
 	
 	override def create(): Unit = {
-		worldRenderer.create();
+		worldRenderer = new Some(new WorldRenderer(DungeonGeneration.randomStartState))
+		stage = Some(new Stage());
+		stage.get.addActor(worldRenderer.get);
 	}
 	
 	override def render(): Unit = {
@@ -43,29 +47,12 @@ class WorldTestRendering() extends Game {
 			Gdx.gl.glClearColor(0, 0, 0, 1);
 			Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 			
-			worldRenderer.render(new Rectangle(0, 0, 1280, 800));			
+			stage.get.act();
+			stage.get.draw();
 		}
 	}
 	
 	def regenerateWorld() {
-		var generator = new BspDungeonGeneration();
-		generator.setHeight(40);
-		generator.setWidth(40);
-		generator.setMinHeight(7);
-		generator.setMinWidth(7);
-		generator.setMaxHeight(17);
-		generator.setMaxWidth(17);
-		generator.setMinRoomHeight(6);
-		generator.setMinRoomWidth(6);
-		generator.setMinPartitionSize(7*7);
-		generator.setMaxPartitionSize(17*17);
-		var rootPartition = generator.generate(System.currentTimeMillis());
-		var map = DungeonTransformer.transformDungeonToLevel(rootPartition);
-		var level = new Level(map);
-		var partitionJoiner = new PartitionJoiner(level);
-		partitionJoiner.joinDungeon(rootPartition);
-		
-		worldRenderer.level = level;
 	}
 	
 	def update() {

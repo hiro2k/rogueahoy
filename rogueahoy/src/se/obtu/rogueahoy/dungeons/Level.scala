@@ -42,4 +42,15 @@ class Level(var map: Array[Array[Cell]]) extends ILosBoard {
 	def resetFov() {
 		currentFov = Array.fill(map.size, map(0).size) { false }
 	}
+	
+	def asResistanceMap(): Array[Array[Float]] = {
+		var resistanceMap = Array.fill(this.map(0).size, this.map.size){0.0f}
+		for(y <- 0 until this.map.size) {
+			for (x <- 0 until this.map(y).size) {
+				resistanceMap(x)(y) = if (map(y)(x).passable) 0.0f else 1.0f
+			}
+		}
+		
+		resistanceMap
+	}
 }

@@ -1,12 +1,10 @@
 package rogueahoy;
 
-import scala.Tuple2;
+import se.obtu.rogueahoy.GameResources;
 import se.obtu.rogueahoy.dungeons.DungeonGeneration;
-import se.obtu.rogueahoy.dungeons.DungeonPartition;
-import se.obtu.rogueahoy.dungeons.Level;
-import se.obtu.rogueahoy.model.entities.PlayerCharacter;
 import se.obtu.rogueahoy.model.world.GameState;
-import se.obtu.rogueahoy.renderers.WorldRenderer;
+import se.obtu.rogueahoy.scene.PlayerCharacterActor;
+import se.obtu.rogueahoy.scene.WorldRenderer;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
@@ -34,16 +32,14 @@ public class WorldAsActorTest extends Game {
 	@Override
 	public void create() {
 		stage = new Stage();
-		
-		Tuple2<Level, DungeonPartition> world = DungeonGeneration.randomLevel();
-		Level level = world._1;
-		PlayerCharacter pc = new PlayerCharacter(level.entryPoint());
-		
-		GameState state = new GameState(pc, level, pc);
-		
-		WorldRenderer renderer = new WorldRenderer(state);
+		GameState startState = DungeonGeneration.randomStartState();
+		WorldRenderer renderer = new WorldRenderer(startState);
 		renderer.setBounds(0, 0, 980, 800);
 		stage.addActor(renderer);
+		
+		GameResources.initializeAssetManager(true);
+		PlayerCharacterActor pcActor = PlayerCharacterActor.apply(renderer.getCamera(), startState);
+		stage.addActor(pcActor);
 	}
 	
 	@Override

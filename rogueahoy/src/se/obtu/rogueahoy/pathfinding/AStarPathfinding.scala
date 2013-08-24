@@ -92,7 +92,7 @@ object AStarPathfinding {
 	def gScoreForCell(cell: Cell) = cell match {
 		case Floor() => 5;
 		case Wall() => 6;
-		case EmptyCell() => 10;
+		case EmptyCell() => 6;
 	}
 
 	def manhattenH(start: (Int, Int), end: (Int, Int)) =

@@ -48,7 +48,7 @@ class PartitionJoiner(var level: Level) {
 
 	def joinRooms(leftRoom: Room, rightRoom: Room, parentPartition: DungeonPartition): Unit = {
 		//pick coords in both rooms
-		Log.logger.debug(s"Joining rooms $leftRoom and $rightRoom");
+//		Log.logger.debug(s"Joining rooms $leftRoom and $rightRoom");
 		var start = ((leftRoom.startX + leftRoom.endX)/2, (leftRoom.startY + leftRoom.endY)/2);
 		var end = ((rightRoom.startX + rightRoom.endX)/2, (rightRoom.startY + rightRoom.endY)/2);
 		

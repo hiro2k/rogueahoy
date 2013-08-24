@@ -1,4 +1,4 @@
-package se.obtu.rogueahoy.renderers;
+package se.obtu.rogueahoy.scene;
 
 import se.obtu.rogueahoy.model.world.GameState;
 
