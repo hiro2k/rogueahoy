@@ -1,5 +1,7 @@
 package se.obtu.rogueahoy.test;
 
+import se.obtu.rogueahoy.GameResources;
+import se.obtu.rogueahoy.dungeons.DungeonGeneration;
 import se.obtu.rogueahoy.ui.UiGroup;
 
 import com.badlogic.gdx.Game;
@@ -43,7 +45,9 @@ public class UiGroupTest extends Game {
 
 	@Override
 	public void create() {
-		this.uiGroup = new UiGroup();
+		GameResources.initializeAssetManager(true);
+		this.uiGroup = new UiGroup(DungeonGeneration.randomStartStateWithoutLevel(), 0f, 0f, 1280f, 800f);
+		uiGroup.sidebarGroup().table().debug();
 		this.stage = new Stage();
 		stage.addActor(uiGroup);
 	}

@@ -10,7 +10,7 @@ public class RogueahoyGame extends Game {
 	@Override
 	public void create() {
 		GameResources.initializeAssetManager(true);
-		GameScreen gameScreen = new GameScreen(DungeonGeneration.randomStartState());
+		GameScreen gameScreen = new GameScreen(DungeonGeneration.testState());
 		this.setScreen(gameScreen);
 	}
 

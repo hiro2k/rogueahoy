@@ -6,24 +6,28 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.Input
+import se.obtu.rogueahoy.model.world.GameState
 
-class UiGroup extends Group {
-	var table = new Table();
-	table.setBounds(981, 0, 299, 800);
-	table.setClip(true);
-	table.top().left();
+class UiGroup(var gameState: GameState, originX: Float, originY: Float, width: Float, height: Float) extends Group {
+	this.setBounds(originX, originY, width, height);
 	
-	var skin = new Skin(Gdx.files.internal("data/uiskin.json"));
-	var label = new Label("Hrongar the Barbarian", skin);
-	table.add(label).expandX().left().colspan(2);
-	table.row(); 	
-	table.add(new Label("HP: 20/25", skin)).left();
-	table.add(new Label("MP: 7/10", skin)).expandX();
-	table.debug();
+	var sidebarGroup = new SidebarGroup(gameState);
+	this.addActor(sidebarGroup)
 	
-	this.addActor(table);
+	var bottomConsole = new BottomConsoleGroup(gameState);
+	bottomConsole.setBounds(0, 0, 980, 80);
+	this.addActor(bottomConsole);
 	
 	override def draw(batch: SpriteBatch, parentAlpha: Float) {
 		super.draw(batch, parentAlpha);
+	}
+	
+	override def act(delta: Float) {
+		super.act(delta);
+		
+		if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
+			Gdx.app.exit();
+		}
 	}
 }

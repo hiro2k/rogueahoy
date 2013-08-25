@@ -2,6 +2,7 @@ package se.obtu.rogueahoy.dungeons
 
 import se.obtu.rogueahoy.model.world.GameState
 import se.obtu.rogueahoy.model.entities.PlayerCharacter
+import se.obtu.rogueahoy.model.entities.PlayerCharacter
 
 object DungeonGeneration {
 
@@ -35,5 +36,29 @@ object DungeonGeneration {
 		var pc = new PlayerCharacter(level.entryPoint);
 		
 		new GameState(pc, level, pc);
+	}
+	
+	def randomStartStateWithoutLevel(): GameState = {
+		var map: Array[Array[Cell]] = Array.fill(1,1) {EmptyCell()}
+		var level = new Level(map);
+		
+		var pc = new PlayerCharacter((1, 1));
+		
+		new GameState(pc, level, pc);
+	}
+	
+	def testState() = {
+		var map = testMap();
+		var level = new Level(map);
+		var pc = new PlayerCharacter((1, 1));
+		
+		new GameState(pc, level, pc);
+	}
+	
+	def testMap(): Array[Array[Cell]] = {
+		Array.tabulate(35, 35)({(y:Int, x:Int) =>
+			if (x == 0 || x == 34 || y == 0 || y == 34) Wall()
+			else Floor()
+		});
 	}
 }

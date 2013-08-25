@@ -18,14 +18,14 @@ class GameScreen(var gameState: GameState) extends Screen with DefaultGameScreen
 	
 	
 	var stage = new Stage();
-	var uiGroup = new UiGroup();
+	var uiGroup = new UiGroup(gameState, 0f, 0f, 1280f, 800f);
 	var worldGroup = new Group();
 	
 	stage.addActor(uiGroup);
 	
-	worldGroup.setBounds(0, 0, 980, 800);
+	worldGroup.setBounds(0, 0, 980, 736);
 	var renderer = new WorldRenderer(gameState);
-	renderer.setBounds(0, 0, 980, 800)
+	renderer.setBounds(0, 80, 980, 736)
 	worldGroup.addActor(renderer);
 		
 	var pcActor = PlayerCharacterActor.apply(renderer.getCamera(), gameState);
