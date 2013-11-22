@@ -30,6 +30,7 @@ public class WorldRenderer extends Actor {
 	private Sprite floorSprite;
 	private Sprite wallSprite;
 	private GameState state;
+	private Matrix4 projectionMatrix;
 
 	private PlayerCharacter playerCharacter;
 	private float[][] levelResistanceMap;
@@ -53,6 +54,8 @@ public class WorldRenderer extends Actor {
 				this.levelResistanceMap, 
 				(int)camera.position.x, 
 				(int)camera.position.y, 10);
+		
+		this.camera.update();
 	}
 	
 	@Override
@@ -110,5 +113,13 @@ public class WorldRenderer extends Actor {
 
 	public void setCamera(OrthographicCamera camera) {
 		this.camera = camera;
+	}
+
+	public Matrix4 getProjectionMatrix() {
+		return projectionMatrix;
+	}
+
+	public void setProjectionMatrix(Matrix4 projectionMatrix) {
+		this.projectionMatrix = projectionMatrix;
 	}
 }

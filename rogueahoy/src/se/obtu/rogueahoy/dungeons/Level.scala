@@ -2,7 +2,7 @@ package se.obtu.rogueahoy.dungeons
 
 import rlforj.los.ILosBoard
 
-class Level(var map: Array[Array[Cell]]) extends ILosBoard {
+class Level(var map: Array[Array[Cell]]) {
 	
 	var entryPoint: (Int, Int) = (0, 0);
 	
@@ -25,13 +25,6 @@ class Level(var map: Array[Array[Cell]]) extends ILosBoard {
 		}
 		else {
 			true
-		}
-	}
-	
-	def visit(x:Int, y:Int) {
-		if (this.contains(x, y)) {
-			currentFov(y)(x) = true;
-			map(y)(x).visited = true;			
 		}
 	}
 	
